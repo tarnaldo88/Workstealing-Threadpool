@@ -43,5 +43,5 @@ namespace wstp {
 
             //the worker threads
             std::vector<std::unique_ptr<Worker>> workers_;            
-    }
+    };
 }
