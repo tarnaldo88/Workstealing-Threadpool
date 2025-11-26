@@ -1,4 +1,10 @@
-// #include "thread_pool.hpp"
+#pragma once
+
+#include <thread>
+#include <atomic>
+#include <memory>
+#include "task.hpp"
+#include "work_stealing_queue.hpp"
 
 namespace wstp {
     class Worker {
