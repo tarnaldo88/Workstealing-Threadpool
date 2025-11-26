@@ -1,0 +1,31 @@
+#pragma once
+
+#include <future>
+#include <functional>
+#include <vector>
+#include <memory>
+#include <atomic>
+
+namespace wstp {
+    class Worker;
+    class WorkStealingQueue;
+    struct Task;
+
+    class ThreadPool {
+        public:
+            explicit ThreadPool(size_t thread_count = 0);
+
+            ~ThreadPool();
+
+            Threadpool(const ThreadPool&) = delete;
+            Threadpool& operator=(const ThreadPool&) = delete;
+
+            Threadpool(const ThreadPool&&) = delete;
+            Threadpool& operator=(const ThreadPool&&) = delete;
+
+            //submit a task returning a future<T>
+            template<typename F, typename... Args>
+            auto submit(F&& f, Args&&... args)-> std::future<std::invoke_result<F,Args....>>;
+
+    }
+}
