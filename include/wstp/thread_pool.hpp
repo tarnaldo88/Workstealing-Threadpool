@@ -27,5 +27,11 @@ namespace wstp {
             template<typename F, typename... Args>
             auto submit(F&& f, Args&&... args)-> std::future<std::invoke_result<F,Args....>>;
 
+            //Submit prioritzed tasks. Higher = more urgent
+            template<typename F, typename... Args>
+            auto schedule(int priority,F&& f, Args&&... args)-> std::future<std::invoke_result<F,Args....>>;
+
+            size_t size() const noexcept {return workers_.size();}
+
     }
 }
