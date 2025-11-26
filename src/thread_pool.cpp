@@ -21,4 +21,29 @@ namespace wstp {
 
         start_workers(thread_count);
     }
+
+    ThreadPool::~ThreadPool() {
+        stop_workers();
+    }
+
+    //Start Workers
+    void ThreadPool::start_workers(size_t count) {
+        for(size_t i = 0; i < count; i++) {
+            workers_.emplace_back(std::make_unique<Worker>(i, this, queues_[i].get()));
+        }
+    }
+
+    void ThreadPool::stop_workers() {
+        stop_.store(true, std::memory_order_relaxed);
+
+        //notify workers
+        for(auto& w : workers_) {
+            w->notify_stop();
+        }
+
+        //join threads
+        for(auto& w : workers_) {
+            w->join();
+        }
+    }
 }

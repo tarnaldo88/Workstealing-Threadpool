@@ -17,26 +17,26 @@ namespace wstp {
 
             ~ThreadPool();
 
-            Threadpool(const ThreadPool&) = delete;
-            Threadpool& operator=(const ThreadPool&) = delete;
+            ThreadPool(const ThreadPool&) = delete;
+            ThreadPool& operator=(const ThreadPool&) = delete;
 
-            Threadpool(const ThreadPool&&) = delete;
-            Threadpool& operator=(const ThreadPool&&) = delete;
+            ThreadPool(const ThreadPool&&) = delete;
+            ThreadPool& operator=(const ThreadPool&&) = delete;
 
             //submit a task returning a future<T>
             template<typename F, typename... Args>
-            auto submit(F&& f, Args&&... args)-> std::future<std::invoke_result<F,Args....>>;
+            auto submit(F&& f, Args&&... args)-> std::future<std::invoke_result<F,Args...>>;
 
             //Submit prioritzed tasks. Higher = more urgent
             template<typename F, typename... Args>
-            auto schedule(int priority,F&& f, Args&&... args)-> std::future<std::invoke_result<F,Args....>>;
+            auto schedule(int priority,F&& f, Args&&... args)-> std::future<std::invoke_result<F,Args...>>;
 
             size_t size() const noexcept {return workers_.size();}
         private:
             void start_workers(size_t count);
             void stop_workers();
 
-            std:;atomic<bool> stop_(false);
+            std::atomic<bool> stop_{false};
 
             //One queue per worker for work stealing
             std::vector<std::unique_ptr<WorkStealingQueue>> queues_;
