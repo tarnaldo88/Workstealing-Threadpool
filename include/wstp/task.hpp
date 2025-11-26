@@ -1,0 +1,6 @@
+
+namespace wstp {
+    class Task {
+        
+    };
+}
