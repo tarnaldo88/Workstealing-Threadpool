@@ -27,6 +27,24 @@ namespace wstp {
 
     //main thread loop
     void Worker::run() {
-        
+        //random engine for stealing
+        std::mt19937 rng(std::random_device{}());
+        size_t num_workers = pool_->size();
+
+        while(!stop_.load(std::memory_order_relaxed)) {
+            std::optional<Task> task;
+
+            task = localQueue_->pop_bottom();
+
+            if(!task) {
+                for(size_t i = 0; i < num_workers;i++) {
+                    if( i == id_) continue;
+
+                    auto& other_queue = pool_->queues_[i];
+                    task = other_queue->steal_top();
+                    if(task) break;
+                }
+            }
+        }
     }
 }
