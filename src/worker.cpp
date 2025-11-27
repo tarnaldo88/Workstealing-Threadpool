@@ -45,6 +45,12 @@ namespace wstp {
                     if(task) break;
                 }
             }
+
+            if(task) {
+                (*task)();
+            } else {
+                std::this_thread::sleep_for(std::chrono::microseconds(50));
+            }
         }
     }
 }
