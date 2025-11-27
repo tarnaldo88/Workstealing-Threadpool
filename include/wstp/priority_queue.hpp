@@ -21,3 +21,21 @@ struct PrioritizedTask {
     }
 };
 
+class PrioritizedTaskQueue {
+public:
+    PrioritizedTaskQueue() = default;
+
+    void push(wstp::Task task, TaskPriority priority);
+
+    wstp::Task pop();
+
+    bool try_pop(wstp::Task& out);
+
+    bool empty() const;
+
+private:
+    mutable std::mutex mtx_;
+
+    std::condition_variable cv_;
+    std::priority_queue<PrioritizedTask> queue_;
+};
