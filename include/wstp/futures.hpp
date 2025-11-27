@@ -11,12 +11,13 @@ namespace wstp {
     class FutureState {
     public:
         void set_value(T val) {
-            std::lock_guard<std::mutex> lock(mtx_);
-            if (ready_) throw std::runtime_error("Value already set");
-            value_ = std::move(val);
-            ready_ = true;
-        
-        cv_.notify_all();
+            {
+                std::lock_guard<std::mutex> lock(mtx_);
+                if (ready_) throw std::runtime_error("Value already set");
+                value_ = std::move(val);
+                ready_ = true;
+            }        
+            cv_.notify_all();
         }
     
     private:
