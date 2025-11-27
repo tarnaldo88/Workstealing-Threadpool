@@ -9,7 +9,15 @@ void PrioritizedTaskQueue::push(wstp::Task task, TaskPriority priority)
 
 wstp::Task PrioritizedTaskQueue::pop()
 {
-    return wstp::Task();
+    std::unique_lock<std::mutex> lock(mtx_);
+
+    cv_.wait(lock, [this]{
+        return !queue_.empty();
+    });
+
+    auto pt = queue_.top();
+    queue_.pop();    
+    return pt.task;
 }
 
 bool PrioritizedTaskQueue::try_pop(wstp::Task &out)
@@ -19,5 +27,5 @@ bool PrioritizedTaskQueue::try_pop(wstp::Task &out)
 
 bool PrioritizedTaskQueue::empty() const
 {
-    return false;
+    return queue_.empty();
 }
