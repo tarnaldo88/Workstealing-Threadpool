@@ -14,4 +14,19 @@ namespace wstp {
         notify_stop();
         join();
     }
+
+    void Worker::notify_stop() {
+        stop_.store(true, std::memory_order_relaxed);
+    }
+
+    void Worker::join() {
+        if(thread_.joinable()) {
+            thread_.join();
+        }
+    }
+
+    //main thread loop
+    void Worker::run() {
+        
+    }
 }
