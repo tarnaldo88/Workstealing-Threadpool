@@ -16,6 +16,14 @@ struct PrioritizedTask {
     wstp::Task task;
     TaskPriority priority;
 
+    PrioritizedTask(wstp::Task t, TaskPriority p): task(std::move(t)), priority(p) {}
+
+    PrioritizedTask(PrioritizedTask&&) noexcept = default;
+    PrioritizedTask& operator=(PrioritizedTask&&) noexcept = default;
+
+    PrioritizedTask(const PrioritizedTask&) = delete;
+    PrioritizedTask& operator=(const PrioritizedTask&) = delete;
+
     bool operator<(const PrioritizedTask& other) const {
         return static_cast<int>(priority) <static_cast<int>(other.priority);
     }
