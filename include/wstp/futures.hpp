@@ -19,6 +19,33 @@ namespace wstp {
             }        
             cv_.notify_all();
         }
+
+        void set_exception(std::exception_ptr ex) {
+            {
+                std::lock_guard<std::mutex> lock(mtx_);
+                if (ready_) throw std::runtime_error("Value already set");
+                exception_ = ex;
+                ready_ = true;
+            }
+            cv_.notify_all();
+        }
+
+         T get() {
+            std::unique_lock<std::mutex> lock(mtx_);
+
+            cv_.wait(lock, [this]{
+                return ready_;
+            });
+
+            if (exception_) std::rethrow_exception(exception_);
+
+            return std::move(*value_);
+        }
+
+        bool is_ready() const {
+            std::lock_guard<std::mutex> lock(mtx_);
+            return ready_;
+        }
     
     private:
         mutable std::mutex mtx_;
