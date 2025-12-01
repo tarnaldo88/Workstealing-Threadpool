@@ -54,4 +54,81 @@ namespace wstp {
         std::exception_ptr exception_;
         bool ready_ = false;
     };
+    template<typename T>
+    class Future {
+    public:
+        Future() = default;
+        explicit Future(std::shared_ptr<FutureState<T>> st) : state_(st) {}
+
+        T get() {
+            if (!state_) throw std::runtime_error("Invalid future");
+            return state_->get();
+        }
+
+        bool valid() const { return (bool)state_; }
+
+    private:
+        std::shared_ptr<FutureState<T>> state_;
+    };
+
+    
+    // Promise<T>    
+    template<typename T>
+    class Promise {
+    public:
+        Promise() : state_(std::make_shared<FutureState<T>>()) {}
+
+        Future<T> get_future() {
+            return Future<T>(state_);
+        }
+
+        void set_value(T val) {
+            state_->set_value(std::move(val));
+        }
+
+        void set_exception(std::exception_ptr ex) {
+            state_->set_exception(ex);
+        }
+
+    private:
+        std::shared_ptr<FutureState<T>> state_;
+    };
+
+    
+    // Convenience: Promise<void>/Future<void>
+    template<>
+    class Future<void> {
+    public:
+        Future() = default;
+        explicit Future(std::shared_ptr<FutureState<int>> st) : dummy_state_(st) {}
+
+        void get() {
+            if (!dummy_state_) throw std::runtime_error("Invalid void future");
+            dummy_state_->get(); // returns int but unused
+        }
+
+    private:
+        std::shared_ptr<FutureState<int>> dummy_state_; // dummy type
+    };
+
+    template<>
+    class Promise<void> {
+    public:
+        Promise() : dummy_state_(std::make_shared<FutureState<int>>()) {}
+
+        Future<void> get_future() {
+            return Future<void>(dummy_state_);
+        }
+
+        void set_value() {
+            dummy_state_->set_value(0);
+        }
+
+        void set_exception(std::exception_ptr ex) {
+            dummy_state_->set_exception(ex);
+        }
+
+    private:
+        std::shared_ptr<FutureState<int>> dummy_state_;
+    };
 }
